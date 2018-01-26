@@ -1,0 +1,31 @@
+CLASS Test5 of type material
+DECLARATION eta of type float
+DECLARATION f0 of type float
+DECLARATION absorption of type color
+EXPRESSION_STATEMENT
+EXPRESSION_STATEMENT
+EXPRESSION_STATEMENT
+FUNCTION_DEF constructor
+DECLARATION I of type vec3 with initializer
+DECLARATION P of type vec3 with initializer
+DECLARATION NN of type vec3 with initializer
+DECLARATION eta_temp of type float with initializer
+DECLARATION atten of type color with initializer
+EXPRESSION_STATEMENT
+EXPRESSION_STATEMENT
+EXPRESSION_STATEMENT
+COMPOUND_STATEMENT
+IF_STATEMENT
+DECLARATION negNdotV of type float with initializer
+DECLARATION k of type float with initializer
+DECLARATION R of type vec3 with initializer
+DECLARATION T of type vec3 with initializer
+EXPRESSION_STATEMENT
+COMPOUND_STATEMENT
+IF_STATEMENT
+DECLARATION Fr of type float with initializer
+DECLARATION Ft of type float with initializer
+DECLARATION refl_result of type color with initializer
+DECLARATION refr_result of type color with initializer
+EXPRESSION_STATEMENT
+FUNCTION_DEF shade
