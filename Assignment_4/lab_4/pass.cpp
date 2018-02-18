@@ -66,12 +66,17 @@ public:
     return false;
   }
 
+
+
   void handleFunction(Function &F) {
     // Reset state
     UsedRegs = 0;
     BlockNames.clear();
     Regs.clear();
     HandledInstrs.clear();
+
+    //DenseSet<Value *> abc;
+    //std::sort(abc.begin(), abc.end());
 
     // Assign unique names to all basic blocks
     std::string FuncName = F.getName();
@@ -96,7 +101,7 @@ public:
       if (HandledInstrs.find(&I) != HandledInstrs.end()) {
         continue;
       }
-      //errs()<<"Instruction	 : "<<I<<"\n";
+
       HandledInstrs.insert(&I);
       handleInstruction(I);
     }
@@ -236,23 +241,44 @@ public:
           break;
       }
     } else if (BranchInst *Br = dyn_cast<BranchInst>(&I)) {
+	  PhiValues.clear();
+	  PhiNodes.clear();
+
       HandledInstrs.insert(&I);
-      errs()<<" Branch :" <<*Br << "\n";
       if(Br->isUnconditional()){
       	BasicBlock *SuccBB = Br->getSuccessor(0);
-      	//for (BasicBlock::iterator SuccI = SuccBB->end(); SuccI != SuccBB->begin(); SuccI--) {
-      	for (Instruction &SuccI : *SuccBB){
-      		if (isa<PHINode>(&SuccI)){
-      			HandledInstrs.insert(&SuccI);
-      			PHINode *phiNode = dyn_cast<PHINode>(&SuccI);
-      			Value *val = phiNode->getIncomingValueForBlock(Br->getParent());
-      			errs() << " Phi Node : " << SuccI<<" Value :" <<*val <<"\n";
-      			loadValue(getInstrReg(&SuccI), val);
-      		}
-      	}
+		for (Instruction &SuccI : *SuccBB){
+			if (isa<PHINode>(&SuccI)){
+				PHINode *phiNode = dyn_cast<PHINode>(&SuccI);
+				Value *inVal = phiNode->getIncomingValueForBlock(Br->getParent());
+				// Store phiNode and Values in SmallVector.
+				PhiValues.push_back(std::make_pair(phiNode, inVal));
+			}
+		 }
+		// Assign Registry to PhiNodes.
+		 for (unsigned i = 0, e = PhiValues.size(); i != e; ++i) {
+			 PHINode *phiNodeI = (&PhiValues[i])->first;
+			 Value *inValI = (&PhiValues[i])->second;
+			 // Check for other Phinodes the usage of first phiNode.
+			 for (unsigned j = i+1, e = PhiValues.size(); j != e; ++j) {
+				 PHINode *phiNodeJ = (&PhiValues[j])->first;
+				 Value *inValJ = (&PhiValues[j])->second;
+				 // If PhiNode has been used, assign register to the user first/
+				 if(phiNodeI == inValJ){
+					 loadValue(getInstrReg(phiNodeJ), inValJ);
+					 PhiNodes.insert(phiNodeJ);
+				 }
+			 }
+			 // Avoid duplicate entries.
+			 if(PhiNodes.count(phiNodeI) <= 0){
+				 loadValue(getInstrReg(phiNodeI), inValI);
+			 }
+		 }
+		// J Statement.
   		emitInstr("j", BlockNames[SuccBB]);
 	  }
     } else if (ICmpInst *Cmp = dyn_cast<ICmpInst>(&I)) {
+      // Retrieve following Branch Instruction.
       BranchInst *Br = getOnlyUser<BranchInst>(Cmp);
       HandledInstrs.insert(&I);
 
@@ -305,13 +331,12 @@ public:
       std::string Op1Reg = getInReg(Op1);
       std::string ResReg = getOutReg(Load);
       unsigned bitSize = Load->getType()->getPrimitiveSizeInBits();
-
+      // Common Instruction (Sext or Zext).
       Instruction *Inst = getOnlyUser<Instruction>(Load);
       std::string ResInst = getOutReg(Inst);
       HandledInstrs.insert(Inst);
 
-      APInt APOffset(bitSize, 0);
-      std::string Op1RegLoad = std::to_string(APOffset.getSExtValue()) + "("+Op1Reg+")" ;
+      std::string Op1RegLoad = std::to_string(0) + "("+Op1Reg+")" ;
 
       if(bitSize == 8){
 		  if(isa<SExtInst>(Inst)){
@@ -327,7 +352,7 @@ public:
 		  }
 	  }
     } else if (isa<PHINode>(&I)) {
-
+    	// Empty.
     } else {
       emitUnimplemented();
     }
@@ -547,6 +572,14 @@ private:
   // Set of already handled instructions. Can be used to avoid
   // repeated handling if two instructions are handled at once.
   DenseSet<Value *> HandledInstrs;
+
+  // This Set contains the phiNides to avoid duplicate registry
+  // allocation of phiNodes.
+  DenseSet<PHINode *> PhiNodes;
+
+  // This vector contains the pair of PhiNode and its Value
+  // It also maintains the insertion Order.
+  SmallVector<std::pair<PHINode*, Value*>, 8> PhiValues;
 };
 
 } // namespace
