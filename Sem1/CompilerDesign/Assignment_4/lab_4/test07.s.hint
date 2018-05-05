@@ -1,0 +1,27 @@
+.data
+
+.text
+main:
+main_0:
+  addi $s0, $zero, 0
+  addi $s1, $zero, 0
+  j main_1
+main_1:
+  addi $s2, $zero, 100
+  blt $s0, $s2, main_2
+  j main_4
+main_2:
+  addu $s3, $s1, $s0
+  j main_3
+main_3:
+  addiu $s4, $s0, 1
+  move $s0, $s4
+  move $s1, $s3
+  j main_1
+main_4:
+  move $a0, $s1
+  jal print_int
+  addi $a0, $zero, 0
+  addi $v0, $zero, 17
+  syscall
+

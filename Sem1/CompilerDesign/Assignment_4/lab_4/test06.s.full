@@ -1,0 +1,50 @@
+.data
+
+.text
+main:
+main_0:
+  addi $s0, $zero, 1
+  addi $s1, $zero, 2
+  bgt $s0, $s1, main_1
+  j main_2
+main_1:
+  addi $s2, $zero, 1
+  j main_3
+main_2:
+  addi $s2, $zero, 2
+  j main_3
+main_3:
+  move $a0, $s2
+  jal print_int
+  jal print_nl
+  addi $s3, $zero, -1
+  addi $s4, $zero, 1
+  bltu $s3, $s4, main_4
+  j main_5
+main_4:
+  addi $s5, $zero, -1
+  j main_6
+main_5:
+  addi $s5, $zero, 1
+  j main_6
+main_6:
+  move $a0, $s5
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 0
+  addi $v0, $zero, 17
+  syscall
+
+print_int:
+  addi $v0, $zero, 1
+  syscall
+  jr $ra
+
+print_nl:
+  addi $v0, $zero, 4
+  la $a0, newline_str
+  syscall
+  jr $ra
+
+.data
+newline_str: .asciiz "\n"

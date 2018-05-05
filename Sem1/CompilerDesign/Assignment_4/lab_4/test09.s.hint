@@ -1,0 +1,67 @@
+.data
+
+.text
+fib:
+fib_0:
+  addi $s0, $zero, 1
+  addi $s1, $zero, 0
+  addi $s2, $zero, 0
+  j fib_1
+fib_1:
+  blt $s2, $a0, fib_2
+  j fib_4
+fib_2:
+  addu $s3, $s1, $s0
+  j fib_3
+fib_3:
+  addiu $s4, $s2, 1
+  move $s1, $s0
+  move $s0, $s3
+  move $s2, $s4
+  j fib_1
+fib_4:
+  move $v0, $s0
+  jr $ra
+
+main:
+main_0:
+  addi $a0, $zero, 0
+  jal fib
+  move $s0, $v0
+  move $a0, $s0
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 1
+  jal fib
+  move $s1, $v0
+  move $a0, $s1
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 2
+  jal fib
+  move $s2, $v0
+  move $a0, $s2
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 3
+  jal fib
+  move $s3, $v0
+  move $a0, $s3
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 4
+  jal fib
+  move $s4, $v0
+  move $a0, $s4
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 5
+  jal fib
+  move $s5, $v0
+  move $a0, $s5
+  jal print_int
+  jal print_nl
+  addi $a0, $zero, 0
+  addi $v0, $zero, 17
+  syscall
+
