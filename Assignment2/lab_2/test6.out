@@ -1,9 +1,0 @@
-CLASS Test6 of type camera
-DECLARATION eta of type float
-DECLARATION f0 of type float
-DECLARATION absorption of type color
-EXPRESSION_STATEMENT
-EXPRESSION_STATEMENT
-EXPRESSION_STATEMENT
-FUNCTION_DEF constructor
-FUNCTION_DEF shade

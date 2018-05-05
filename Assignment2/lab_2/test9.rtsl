@@ -1,8 +1,0 @@
-/*
-  Test 9, syntax error:
-  "syntax error, unexpected IDENTIFIER, expecting $end on line 7"
-*/
-
-class Test9 : rt_Camera;
-
-eta;
